@@ -1,0 +1,24 @@
+{
+  "name": "buildaid-template",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vite": "^7.3.1"
+  },
+  "dependencies": {
+    "jazz-tools": "^0.20.9"
+  },
+  "overrides": {
+    "rfc6902": "^5.0.0"
+  }
+}
+
+
