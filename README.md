@@ -1,4 +1,4 @@
-# BuildAid Template (Vanilla TS + Jazz)
+# BildAid Template (Vanilla TS + Jazz)
 
 - Vite + TypeScript
 - Vanilla DOM UI (no framework)
