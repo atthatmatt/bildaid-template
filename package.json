@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "check": "tsc -p tsconfig.json --noEmit"
+    "check": "tsc -p tsconfig.json --noEmit",
+    "oversys:rt": "bash -c 'rm -rf oversys-test && mkdir -p oversys-test/modules && cp -r modules/oversys oversys-test/modules/oversys && cd oversys-test/modules/oversys && npm install && npm run build && node dist/cli.js run v1/config_v1.md'"
   },
   "devDependencies": {
     "typescript": "~5.9.3",
