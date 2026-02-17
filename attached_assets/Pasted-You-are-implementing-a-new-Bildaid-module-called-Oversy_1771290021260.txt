@@ -1,0 +1,101 @@
+You are implementing a new Bildaid module called Oversys inside the existing bildaid-template repo.
+
+IMPORTANT CONSTRAINTS
+- I will run any non-read-only git commands manually in the shell/GUI (creating branches, switching branches, commits, pushes, merges). You must NOT run git commands that modify state.
+- Use the existing Bildaid stack only (TypeScript/Node/Vite ecosystem already in repo). Do NOT introduce new frameworks, workflow engines, databases, Redis, Temporal, etc.
+- Oversys v1 is CLI-first: it reads an Oversys config file (markdown with an embedded YAML block), runs scenarios via a deterministic simulation (event log + state machine), validates invariants, and writes an immutable run report markdown file.
+- Add a local “round-trip” harness folder oversys-test/ that simulates a freshly-generated repo instance. oversys-test must be gitignored.
+- Keep it minimal and working end-to-end.
+
+MANUAL STEPS I WILL DO FIRST
+1) I will create and switch to branch: feature/oversys
+2) I will ensure the repo is clean
+
+YOUR TASKS (DO THESE IN ORDER)
+A) Create module skeleton
+1) Create folder: modules/oversys/
+2) Add README.md describing Oversys (1 page max), how to run CLI, and file layout.
+3) Create versioned contract folder: modules/oversys/v1/
+   - config_v1.md (markdown with embedded YAML contract block)
+   - runs/ (empty initially, but created)
+4) Add oversys-test/ harness folder at repo root, and add it to .gitignore:
+   - /oversys-test/
+
+B) Define the minimal Oversys contract format (YAML embedded in markdown)
+1) In modules/oversys/v1/config_v1.md:
+   - Include a short human intro section
+   - Include a fenced YAML block marked clearly (e.g. ```yaml ... ```).
+   - The YAML must define:
+     - oversys version
+     - system id
+     - event types (enumerated)
+     - rules: transitions (from-state + event -> to-state)
+     - invariants (at least 2 invariants)
+     - subscriptions (at least 1 subscription that auto-emits claim/start/complete)
+     - scenarios (at least 2):
+       - happy path
+       - a failure/invariant violation case
+2) Use a tiny toy system that proves the protocol:
+   - a WorkLedger ticket lifecycle (Requested -> Claimed -> InProgress -> Completed -> Accepted)
+   - Event types: WorkRequested, WorkClaimed, WorkStarted, WorkCompleted, WorkAccepted, WorkFailed, Tick (Tick may be unused in v1 if you keep leases out of MVP)
+   - Invariants:
+     - only enumerated events allowed
+     - transitions must be valid (no event from invalid state)
+     - (optional) completed requires outputs field present
+
+C) Implement the Oversys CLI runner (minimal, deterministic)
+1) Implement a Node/TS CLI inside modules/oversys/src/ that supports:
+   - `oversys run <path-to-config-md>`
+   - It should:
+     a) read the markdown file
+     b) extract the first fenced YAML block
+     c) parse YAML
+     d) validate schema minimally (presence of key sections)
+     e) run each scenario:
+        - maintain: work item state map (workId -> state)
+        - maintain: event timeline list
+        - apply transitions + check invariants
+        - process subscriptions when scenario step requests it (auto_process_subscriptions: true)
+     f) write a report markdown file into modules/oversys/v1/runs/ with an incremented name:
+        - config_v1_run_0001.md (if none exist)
+        - include: config hash, timestamp, pass/fail per scenario, and an event trace table
+2) Use ONLY one small dependency if absolutely necessary:
+   - If YAML parsing is needed and the repo does not already include one, add a minimal YAML parser (e.g. yaml npm package).
+   - Prefer no extra deps if already present in repo.
+3) The CLI must resolve paths relative to the current working directory, so it works in oversys-test/ too.
+
+D) Wire module package scripts without changing global tooling
+1) If the repo uses a monorepo/workspace, integrate Oversys with the existing pattern.
+2) Otherwise, add a minimal package.json under modules/oversys that can build and run:
+   - `npm run build` (tsc)
+   - `npm run oversys -- run v1/config_v1.md` (or equivalent)
+3) Keep it consistent with what is already in bildaid-template (inspect existing modules for conventions first).
+
+E) Implement the “round-trip” harness oversys-test/
+Goal: verify Oversys works as if it were used in a newly-generated repo copy of bildaid-template.
+
+1) Create oversys-test/ folder structure:
+   - oversys-test/modules/oversys (copy of the module for test; for now you can keep it as a copied folder or a minimal symlink if Replit supports it; if symlinks are risky, copy)
+2) Provide a root-level dev script (in the main repo, not in oversys-test) that:
+   - deletes oversys-test/
+   - recreates it
+   - copies modules/oversys into oversys-test/modules/oversys
+   - runs the Oversys CLI inside oversys-test against oversys-test/modules/oversys/v1/config_v1.md
+3) Ensure oversys-test stays ignored and is safe to delete/regenerate repeatedly.
+
+F) Prove it works
+1) Run Oversys in the main repo against modules/oversys/v1/config_v1.md and generate the first run report.
+2) Run the round-trip harness command and show output confirming it executed and wrote a run report inside oversys-test copy.
+
+OUTPUT REQUIREMENTS
+- After changes, print:
+  - The exact commands I should run (read-only is okay) to execute:
+    1) Oversys CLI locally in repo
+    2) Oversys round-trip harness
+  - A short tree listing of modules/oversys and oversys-test
+- Do NOT ask me questions unless you are blocked by missing repo details.
+- If you must choose between “minimal and working” vs “feature rich”, choose minimal and working.
+
+Stop when:
+- Oversys CLI runs successfully and writes a run report
+- Round-trip harness runs successfully

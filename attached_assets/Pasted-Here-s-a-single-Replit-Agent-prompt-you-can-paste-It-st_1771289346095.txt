@@ -1,0 +1,164 @@
+Here’s a **single Replit Agent prompt** you can paste. It stays minimal, builds a round-trip harness, and gives you a working CLI + “run config → emit run report” loop.
+
+````text
+You are implementing a new module called Oversys inside this repo. Oversys is a minimal “contract runner” that reads an Oversys config from a Markdown file (with a fenced YAML block), simulates declared scenarios, checks invariant rules, and writes an immutable run report Markdown file.
+
+GOALS
+- Work on a new git branch: feature/oversys.
+- Create modules/oversys with a minimal runnable CLI.
+- Add an in-repo round-trip harness folder oversys-test/ (ignored by git) that mimics a fresh repo copy using Oversys.
+- Provide a single command to refresh oversys-test from modules/oversys and run the Oversys CLI inside oversys-test.
+- Keep everything as small as possible; do not build a UI.
+
+STEP 0 — GIT SETUP
+1) Create and switch to branch feature/oversys.
+
+STEP 1 — CREATE MODULE SKELETON
+Create: modules/oversys/
+- README.md (brief: what it is + how to run)
+- v1/config_v1.md (contains embedded YAML contract; include 2 scenarios: happy path + lease-expiry failure)
+- v1/runs/ (empty directory committed)
+- src/
+  - cli.ts
+  - parseConfig.ts
+  - simulate.ts
+  - report.ts
+  - types.ts
+- package.json (module-local; include bin entry for “oversys”)
+- tsconfig.json (module-local; compile to dist/)
+- dist/ output should be gitignored within the module
+
+Assume the repo uses TypeScript already; prefer plain Node + TypeScript compilation. If the repo uses pnpm or npm, integrate in the simplest way that works in this repo. Prefer not to change the root build system more than necessary.
+
+STEP 2 — CONFIG FORMAT (MANDATORY)
+modules/oversys/v1/config_v1.md must be markdown with a single fenced code block like:
+
+```oversys
+<YAML here>
+````
+
+The YAML must define:
+
+* oversys: 1
+* system.id
+* events: list of event types (only used for validation)
+* rules.transitions: from + event + to (simple state machine)
+* rules.invariants: at least:
+
+  * only_lease_owner_can_progress
+  * lease_must_be_valid_for_progress
+* rules.lease: duration_ticks and clock_event (Tick)
+* subscriptions: minimal declarative auto-handler that on WorkRequested for a specific workType emits WorkClaimed, WorkStarted, WorkCompleted (in order)
+* scenarios: at least 2
+
+  1. happy_path: user emits WorkRequested; auto_process_subscriptions=true; assert work reaches Completed (or Accepted if you add acceptance)
+  2. lease_expires: claim work; advance time via Tick beyond lease; attempt WorkStarted; expect invariant failure
+
+Keep it minimal: use only these event types:
+WorkRequested, WorkClaimed, WorkStarted, WorkCompleted, WorkFailed, WorkAccepted (optional), Tick
+
+STEP 3 — SIMULATION ENGINE (MINIMAL)
+Implement a deterministic simulator:
+
+* Maintain “now_tick” integer (starts from scenario given.now_tick or 0)
+* Maintain WorkState map by workId:
+
+  * status (Requested/Claimed/InProgress/Completed/Accepted/Failed/etc)
+  * leaseOwner, leaseUntil, leaseNonce (nonce can be simple increment integer)
+* Process steps in scenario:
+
+  * emit: adds event to trace and applies transitions + invariants
+  * auto_process_subscriptions: when true, after each emit, repeatedly apply subscriptions until no more apply (cap with a reasonable max like 50 to avoid loops)
+  * Tick: sets now_tick = payload.t
+* Lease rules:
+
+  * When WorkClaimed occurs, set leaseUntil = now_tick + duration_ticks, leaseOwner = actor, leaseNonce += 1
+  * WorkStarted/WorkCompleted/WorkFailed require:
+
+    * actor == current leaseOwner
+    * now_tick < leaseUntil
+  * If invariant fails, record scenario failure with invariant id and stop scenario
+
+Transitions:
+
+* apply transition if rule matches current status + event type
+* if no transition rule matches, treat as error (scenario fail)
+
+Subscriptions:
+
+* support only a minimal predicate:
+
+  * listens_for: WorkRequested
+  * when.workType equals some declared id
+  * emits: [WorkClaimed, WorkStarted, WorkCompleted] with actor fixed to e.g. worker:projection
+* For emitted subscription events, use same workId and respect invariants.
+
+Assertions:
+
+* allow assert of final status:
+
+  * assert: state_of.workId equals <Status>
+* allow assert_fail: <invariant_id>
+
+STEP 4 — RUN REPORT OUTPUT (IMMUTABLE)
+CLI command:
+
+* oversys run <path/to/config.md>
+
+Behavior:
+
+* Parse config
+* Run all scenarios
+* Write a run report markdown file to:
+  modules/oversys/v1/runs/<config_base>_run_0001.md (increment if exists)
+* Report must include:
+
+  * config file path
+  * config hash (sha256 of the parsed YAML text or full file)
+  * runner version (package.json version)
+  * summary table of scenarios pass/fail
+  * for each scenario: trace of events with now_tick, plus final state or failure reason
+
+STEP 5 — ROUND-TRIP HARNESS (MANDATORY)
+At repo root:
+
+* create oversys-test/ (do NOT commit contents)
+* add /oversys-test/ to .gitignore
+* add a root script command (package.json) called:
+
+  * oversys:rt
+
+oversys:rt must:
+
+1. delete oversys-test if it exists
+2. recreate oversys-test/modules
+3. copy modules/oversys into oversys-test/modules/oversys
+4. inside oversys-test, create a minimal package.json that can run the oversys bin via node
+5. build oversys inside oversys-test (tsc) and run:
+   node modules/oversys/dist/cli.js run modules/oversys/v1/config_v1.md
+6. Ensure the run report is created in oversys-test/modules/oversys/v1/runs/
+
+This proves Oversys works when used from a “fresh template repo copy”.
+
+STEP 6 — FINAL CHECKS
+
+* Ensure `npm run oversys:rt` (or pnpm equivalent already used in repo) succeeds.
+* Keep the code small and readable.
+* Do not add a UI.
+* Do not introduce heavy dependencies. If you need YAML parsing, use a small dependency (e.g. yaml). If the repo already has one, reuse it.
+
+DELIVERABLES
+
+* modules/oversys implemented per above
+* .gitignore updated to ignore oversys-test
+* root script oversys:rt working
+* README with usage:
+
+  * (from root) run oversys round-trip: <command>
+  * (in a real project) run oversys: node modules/oversys/dist/cli.js run modules/oversys/v1/config_v1.md
+
+```
+
+If Replit asks for clarifications about package manager (npm vs pnpm) or TS build tooling, **inspect the repo** and choose whatever it already uses.
+::contentReference[oaicite:0]{index=0}
+```
