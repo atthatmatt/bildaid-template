@@ -1,0 +1,212 @@
+#!/usr/bin/env python3
+"""
+SEO Flywheel Controller — Single-file reference pseudocode.
+
+This is NOT executable code. It illustrates the full controller loop
+in one file for readability. Adapt to your actual language/framework.
+"""
+
+import sqlite3, json, os, hashlib
+from datetime import datetime, timedelta
+
+# --- Config ---
+
+SITE_BASE_URL = env("SITE_BASE_URL")
+SEO_DB_PATH = env("SEO_DB_PATH", "./data/seo_controller.sqlite")
+MODE = env("MODE", "stub")
+GSC_MODE = env("GSC_MODE", "export_file")
+GSC_EXPORT_PATH = env("GSC_EXPORT_PATH", "./data/gsc_last_28_days.jsonl")
+CMS_MODE = env("CMS_MODE", "stub")
+MIN_IMPRESSIONS = int(env("MIN_IMPRESSIONS", "10"))
+POSITION_MIN = float(env("POSITION_MIN", "8"))
+POSITION_MAX = float(env("POSITION_MAX", "20"))
+MAX_PAGES_PER_RUN = int(env("MAX_PAGES_PER_RUN", "5"))
+COOLDOWN_DAYS = int(env("COOLDOWN_DAYS", "7"))
+DATE_RANGE_LABEL = env("DATE_RANGE_LABEL", "last_28_days")
+
+
+# --- Database ---
+
+def open_db():
+    db = sqlite3.connect(SEO_DB_PATH)
+    db.execute("PRAGMA journal_mode=WAL")
+    with open("templates/db.schema.sql") as f:
+        db.executescript(f.read())
+    return db
+
+def log_action(db, type, page_url=None, status="started", payload=None, result=None):
+    db.execute(
+        "INSERT INTO actions (type, page_url, status, payload_json, result_json) VALUES (?, ?, ?, ?, ?)",
+        (type, page_url, status, json.dumps(payload), json.dumps(result))
+    )
+    db.commit()
+
+
+# --- GSC Adapter ---
+
+def gsc_fetch():
+    if GSC_MODE == "export_file":
+        if not os.path.exists(GSC_EXPORT_PATH):
+            raise FileNotFoundError(f"GSC export not found at {GSC_EXPORT_PATH}")
+        rows = []
+        with open(GSC_EXPORT_PATH) as f:
+            for line in f:
+                rows.append(json.loads(line))
+        return rows
+    elif GSC_MODE == "api":
+        # Use google-auth + requests to call Search Console API
+        # POST https://searchconsole.googleapis.com/webmasters/v3/sites/{siteUrl}/searchAnalytics/query
+        raise NotImplementedError("Wire GSC API OAuth here")
+    else:
+        raise ValueError(f"Unknown GSC_MODE: {GSC_MODE}")
+
+
+# --- CMS Adapter ---
+
+def cms_fetch_content(url):
+    if CMS_MODE == "stub":
+        return {"url": url, "title": "", "body": "", "meta_description": ""}
+    # Wire actual CMS API here
+    raise NotImplementedError(f"CMS adapter for {CMS_MODE}")
+
+def cms_publish(url, plan):
+    if MODE == "stub":
+        return {"action": "stub", "logged": True}
+    elif MODE == "todo":
+        # Create a task/issue for human review
+        return {"action": "todo_created"}
+    elif MODE == "pr":
+        # Open a PR with the proposed changes
+        return {"action": "pr_opened"}
+    elif MODE == "publish":
+        # Update CMS directly
+        return {"action": "published"}
+
+
+# --- Controller ---
+
+def run_daily():
+    db = open_db()
+    now = datetime.utcnow().isoformat()
+
+    # 1. INGEST
+    log_action(db, "ingest", status="started")
+    try:
+        rows = gsc_fetch()
+    except FileNotFoundError as e:
+        log_action(db, "ingest", status="error", result={"error": str(e),
+            "todo": f"Export GSC data to {GSC_EXPORT_PATH}"})
+        return
+    for row in rows:
+        db.execute("""
+            INSERT OR REPLACE INTO gsc (page, query, impressions, clicks, position, date_range)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (row["page"], row["query"], row["impressions"], row["clicks"], row["position"], DATE_RANGE_LABEL))
+        db.execute("""
+            INSERT OR REPLACE INTO pages (url, last_seen_at) VALUES (?, ?)
+        """, (row["page"], now))
+    db.commit()
+    log_action(db, "ingest", status="done", result={"rows_loaded": len(rows)})
+
+    # 2. SELECT
+    log_action(db, "select", status="started")
+    candidates = db.execute("""
+        SELECT page, SUM(impressions) as imp, AVG(position) as pos, SUM(clicks) as clk
+        FROM gsc WHERE date_range = ?
+        GROUP BY page
+        HAVING imp >= ? AND pos BETWEEN ? AND ?
+        ORDER BY imp DESC
+    """, (DATE_RANGE_LABEL, MIN_IMPRESSIONS, POSITION_MIN, POSITION_MAX)).fetchall()
+
+    selected = []
+    for page, imp, pos, clk in candidates:
+        cooldown = db.execute("SELECT cooldown_until FROM pages WHERE url = ?", (page,)).fetchone()
+        if cooldown and cooldown[0] and cooldown[0] > now:
+            log_action(db, "select", page_url=page, status="skipped", result="cooldown")
+            continue
+        selected.append({"page": page, "imp": imp, "pos": pos, "clk": clk})
+        if len(selected) >= MAX_PAGES_PER_RUN:
+            break
+    log_action(db, "select", status="done", result={"found": len(selected)})
+
+    # 3. PLAN + 4. PUBLISH
+    for info in selected:
+        log_action(db, "plan", page_url=info["page"], status="started")
+        content = cms_fetch_content(info["page"])
+        queries = db.execute("""
+            SELECT query, impressions, clicks, position FROM gsc
+            WHERE page = ? AND date_range = ? ORDER BY impressions DESC LIMIT 10
+        """, (info["page"], DATE_RANGE_LABEL)).fetchall()
+
+        plan = generate_plan(content, queries)
+        log_action(db, "plan", page_url=info["page"], status="done", payload=plan)
+
+        log_action(db, "publish", page_url=info["page"], status="started")
+        result = cms_publish(info["page"], plan)
+        status = "skipped" if MODE == "stub" else "done"
+        log_action(db, "publish", page_url=info["page"], status=status, result=result)
+
+        cooldown_until = (datetime.utcnow() + timedelta(days=COOLDOWN_DAYS)).isoformat()
+        db.execute("UPDATE pages SET cooldown_until = ? WHERE url = ?", (cooldown_until, info["page"]))
+        db.commit()
+
+    # 5. BASELINES
+    for info in selected:
+        exists = db.execute("SELECT 1 FROM baselines WHERE page_url = ?", (info["page"],)).fetchone()
+        if not exists:
+            db.execute("""
+                INSERT INTO baselines (page_url, baseline_clicks, baseline_impressions, baseline_position, recorded_at)
+                VALUES (?, ?, ?, ?, ?)
+            """, (info["page"], info["clk"], info["imp"], info["pos"], now))
+    db.commit()
+
+    print(f"[seo-flywheel] Daily run complete. Processed {len(selected)} pages.")
+
+
+def run_weekly_measure():
+    db = open_db()
+    baselines = db.execute("SELECT * FROM baselines").fetchall()
+    for page_url, b_clicks, b_imp, b_pos, recorded_at in baselines:
+        current = db.execute("""
+            SELECT SUM(clicks), SUM(impressions), AVG(position)
+            FROM gsc WHERE page = ? AND date_range = ?
+        """, (page_url, DATE_RANGE_LABEL)).fetchone()
+        if not current or current[0] is None:
+            continue
+        delta = {
+            "clicks": current[0] - b_clicks,
+            "impressions": current[1] - b_imp,
+            "position": round(b_pos - current[2], 2)
+        }
+        log_action(db, "measure", page_url=page_url, status="done",
+                   payload={"baseline": {"clicks": b_clicks, "impressions": b_imp, "position": b_pos}},
+                   result=delta)
+    print("[seo-flywheel] Weekly measure complete.")
+
+
+def generate_plan(content, queries):
+    """Generate a minimal refresh plan for a page."""
+    plan = {"suggestions": [], "internal_links": []}
+    if queries:
+        top_query = queries[0][0]
+        if top_query.lower() not in content.get("title", "").lower():
+            plan["suggestions"].append({
+                "type": "title",
+                "reason": f"Top query '{top_query}' not in title",
+                "current": content.get("title", ""),
+                "proposed": f"{content.get('title', '')} — {top_query}"
+            })
+    return plan
+
+
+# --- Entry point ---
+
+if __name__ == "__main__":
+    import sys
+    cmd = sys.argv[1] if len(sys.argv) > 1 else "daily"
+    if cmd == "daily":
+        run_daily()
+    elif cmd == "measure":
+        run_weekly_measure()
+    else:
+        print(f"Usage: python seo_controller.py [daily|measure]")

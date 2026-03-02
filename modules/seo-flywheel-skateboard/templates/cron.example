@@ -1,0 +1,5 @@
+# Daily run at 03:15
+15 3 * * * cd /path/to/repo && MODE=pr DATE_RANGE_LABEL=last_28_days_$(date +\%F) ./run_seo_daily.sh
+
+# Weekly measure on Sundays at 04:10
+10 4 * * 0 cd /path/to/repo && ./run_seo_weekly_measure.sh
