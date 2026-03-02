@@ -11,15 +11,27 @@ export function runScenarios(config: OversysConfig): ScenarioResult[] {
   return config.scenarios.map((s) => runScenario(config, s));
 }
 
+interface SimState {
+  workItems: Map<string, WorkItem>;
+  trace: TraceEntry[];
+  nowTick: number;
+}
+
 function runScenario(config: OversysConfig, scenario: ScenarioDef): ScenarioResult {
-  const workItems = new Map<string, WorkItem>();
-  const trace: TraceEntry[] = [];
-  let nowTick = 0;
+  const state: SimState = {
+    workItems: new Map(),
+    trace: [],
+    nowTick: 0,
+  };
   let failureReason: string | undefined;
   let failedInvariant: string | undefined;
 
   for (const step of scenario.steps) {
-    const result = applyEmit(config, workItems, trace, nowTick, step.emit, "user");
+    if (step.emit.event === "Tick" && step.emit.t !== undefined) {
+      state.nowTick = step.emit.t;
+    }
+
+    const result = applyEmit(config, state, step.emit, "user");
     if (!result.ok) {
       failureReason = result.error;
       failedInvariant = result.invariantId;
@@ -27,7 +39,7 @@ function runScenario(config: OversysConfig, scenario: ScenarioDef): ScenarioResu
     }
 
     if (step.auto_process_subscriptions) {
-      const subResult = processSubscriptions(config, workItems, trace, nowTick, step.emit.workId, step.emit);
+      const subResult = processSubscriptionsToQuiescence(config, state, step.emit.workId, step.emit);
       if (!subResult.ok) {
         failureReason = subResult.error;
         failedInvariant = subResult.invariantId;
@@ -37,7 +49,7 @@ function runScenario(config: OversysConfig, scenario: ScenarioDef): ScenarioResu
   }
 
   const finalStates: Record<string, string | null> = {};
-  for (const [id, item] of workItems) {
+  for (const [id, item] of state.workItems) {
     finalStates[id] = item.status;
   }
 
@@ -69,7 +81,7 @@ function runScenario(config: OversysConfig, scenario: ScenarioDef): ScenarioResu
     id: scenario.id,
     description: scenario.description,
     pass,
-    trace,
+    trace: state.trace,
     finalStates,
     failureReason: pass ? undefined : failureReason,
     expectedFailInvariant: expectFail?.assert_fail,
@@ -84,35 +96,47 @@ interface ApplyResult {
 
 function applyEmit(
   config: OversysConfig,
-  workItems: Map<string, WorkItem>,
-  trace: TraceEntry[],
-  nowTick: number,
+  state: SimState,
   emit: ScenarioStep["emit"],
   source: "user" | "subscription"
 ): ApplyResult {
   if (!config.events.includes(emit.event)) {
     const entry: TraceEntry = {
-      tick: nowTick,
+      tick: state.nowTick,
       event: emit.event,
       workId: emit.workId,
       actor: emit.actor,
-      stateBefore: workItems.get(emit.workId)?.status ?? null,
+      stateBefore: state.workItems.get(emit.workId)?.status ?? null,
       stateAfter: null,
       source,
       error: "only_enumerated_events",
     };
-    trace.push(entry);
+    state.trace.push(entry);
     return { ok: false, error: `Event '${emit.event}' is not enumerated`, invariantId: "only_enumerated_events" };
   }
 
-  const currentStatus = workItems.get(emit.workId)?.status ?? null;
+  if (emit.event === "Tick") {
+    const entry: TraceEntry = {
+      tick: state.nowTick,
+      event: emit.event,
+      workId: emit.workId,
+      actor: emit.actor,
+      stateBefore: null,
+      stateAfter: null,
+      source,
+    };
+    state.trace.push(entry);
+    return { ok: true };
+  }
+
+  const currentStatus = state.workItems.get(emit.workId)?.status ?? null;
   const rule = config.rules.transitions.find(
     (t) => t.from === currentStatus && t.event === emit.event
   );
 
   if (!rule) {
     const entry: TraceEntry = {
-      tick: nowTick,
+      tick: state.nowTick,
       event: emit.event,
       workId: emit.workId,
       actor: emit.actor,
@@ -121,7 +145,7 @@ function applyEmit(
       source,
       error: "valid_transition",
     };
-    trace.push(entry);
+    state.trace.push(entry);
     return {
       ok: false,
       error: `No transition for event '${emit.event}' from state '${currentStatus}'`,
@@ -130,7 +154,7 @@ function applyEmit(
   }
 
   const entry: TraceEntry = {
-    tick: nowTick,
+    tick: state.nowTick,
     event: emit.event,
     workId: emit.workId,
     actor: emit.actor,
@@ -138,57 +162,66 @@ function applyEmit(
     stateAfter: rule.to,
     source,
   };
-  trace.push(entry);
+  state.trace.push(entry);
 
-  if (!workItems.has(emit.workId)) {
-    workItems.set(emit.workId, { status: null });
+  if (!state.workItems.has(emit.workId)) {
+    state.workItems.set(emit.workId, { status: null });
   }
-  workItems.get(emit.workId)!.status = rule.to;
+  state.workItems.get(emit.workId)!.status = rule.to;
 
   return { ok: true };
 }
 
-function processSubscriptions(
+interface QueueItem {
+  traceEntry: TraceEntry;
+  payload: Record<string, unknown>;
+}
+
+function processSubscriptionsToQuiescence(
   config: OversysConfig,
-  workItems: Map<string, WorkItem>,
-  trace: TraceEntry[],
-  nowTick: number,
-  workId: string,
-  triggerEvent?: ScenarioStep["emit"]
+  state: SimState,
+  _workId: string,
+  triggerEvent: ScenarioStep["emit"]
 ): ApplyResult {
   const subs = config.subscriptions ?? [];
-  const maxIterations = 50;
-  let iterations = 0;
+  if (subs.length === 0) return { ok: true };
 
-  for (const sub of subs) {
-    const lastEvent = trace[trace.length - 1];
-    if (!lastEvent || lastEvent.event !== sub.listens_for) continue;
+  const maxEvents = 200;
+  const queue: QueueItem[] = [{
+    traceEntry: state.trace[state.trace.length - 1]!,
+    payload: triggerEvent as unknown as Record<string, unknown>,
+  }];
 
-    if (sub.when && triggerEvent) {
-      let matches = true;
-      for (const [key, value] of Object.entries(sub.when)) {
-        const emitVal = (triggerEvent as Record<string, unknown>)[key];
-        if (emitVal !== value) {
-          matches = false;
-          break;
-        }
-      }
-      if (!matches) continue;
+  while (queue.length > 0) {
+    if (state.trace.length > maxEvents) {
+      return { ok: false, error: "Subscription processing exceeded max events (possible loop)" };
     }
 
-    for (const emitDef of sub.emits) {
-      if (iterations++ >= maxIterations) {
-        return { ok: false, error: "Subscription processing exceeded max iterations" };
+    const current = queue.shift()!;
+
+    for (const sub of subs) {
+      if (current.traceEntry.event !== sub.listens_for) continue;
+
+      if (sub.when) {
+        let matches = true;
+        for (const [key, value] of Object.entries(sub.when)) {
+          if (current.payload[key] !== value) {
+            matches = false;
+            break;
+          }
+        }
+        if (!matches) continue;
       }
-      const result = applyEmit(
-        config,
-        workItems,
-        trace,
-        nowTick,
-        { event: emitDef.event, workId, actor: emitDef.actor },
-        "subscription"
-      );
-      if (!result.ok) return result;
+
+      for (const emitDef of sub.emits) {
+        const emitPayload = { event: emitDef.event, workId: current.traceEntry.workId, actor: emitDef.actor };
+        const result = applyEmit(config, state, emitPayload, "subscription");
+        if (!result.ok) return result;
+        queue.push({
+          traceEntry: state.trace[state.trace.length - 1]!,
+          payload: emitPayload as unknown as Record<string, unknown>,
+        });
+      }
     }
   }
 

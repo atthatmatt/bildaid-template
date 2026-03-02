@@ -6,7 +6,7 @@ export interface OversysConfig {
     transitions: TransitionRule[];
     invariants: InvariantDef[];
   };
-  subscriptions: SubscriptionDef[];
+  subscriptions?: SubscriptionDef[];
   scenarios: ScenarioDef[];
 }
 
@@ -24,7 +24,7 @@ export interface InvariantDef {
 export interface SubscriptionDef {
   id: string;
   listens_for: string;
-  when: Record<string, string>;
+  when?: Record<string, string>;
   emits: { event: string; actor: string }[];
 }
 
@@ -41,6 +41,7 @@ export interface ScenarioStep {
     workId: string;
     workType?: string;
     actor: string;
+    t?: number;
   };
   auto_process_subscriptions?: boolean;
 }
