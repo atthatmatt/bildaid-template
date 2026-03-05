@@ -1,10 +1,11 @@
-Intenshion Instructions
+# Intenshion Instructions
 
-BLUF
+## BLUF
 The Intenshion (insh) system sits between human desires and machine specifications.
-Insh reflects the way real world human work is messy and only sometimes turns into durable automation.
+Insh reflects the way real world human work is messy (case mgmt) and only sometimes turns into durable automation (process mgmt).
 
-- Polishy/polishys (pol-i-she): Rules.
+## Parts
+- Polishy/polishys (pa-li-she): Rules.
 - Objecshion/objecshions (ob-jec-shun): Assertion that work must be done.
 - Cashe/cashes (k-ay-s): Project to reduce one or more objecshions below action threshold.
 - Acshion/acshions (ak-sh-on): Work design soup (use>do>get).
