@@ -1,0 +1,19 @@
+{
+  "name": "oversys",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "oversys": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "oversys": "node dist/cli.js"
+  },
+  "dependencies": {
+    "yaml": "^2.7.1"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3"
+  }
+}
