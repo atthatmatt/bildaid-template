@@ -4,12 +4,13 @@
 The Intenshion (insh) system sits between human desires and machine specifications.
 Insh reflects the way real world human work is messy (case mgmt) and only sometimes turns into durable automation (process mgmt).
 Insh is designed to seek homeostasis. It will direct work when appropriate, never for its own sake. Figuring out what "appropriate" means in each case is the purpose of Intenshion.
+Insh is not a system with its own purpose it is an extension of a person with a purpose.
 
 ## Polishy
-Polishys are structured rules that Insh must follow.
+Polishys encode intentions that shape normal operation. Default polishy is "maintain normal forever" and "
 
 ## Objecshion
-Objecshions are requests for work justified by polishy. Essentially, [current polishy violation > future polishy compliance].
+Objecshions request work justified by polishy. Essentially, [current polishy violation > future polishy compliance]. Objecshions can also propose polishy change.
 
 ## Cashe
 Cashes are work orders that reduces target objecshions below their action threshold. This does not mean polishy violations must be eliminated and the cashe does not have to close. The threshold is a living negotiation.
