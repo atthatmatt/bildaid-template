@@ -1,13 +1,13 @@
 # Intenshion Instructions
 
 ## BLUF
-The Intenshion (insh) system sits between a person's desires and machine specifications. Insh turns intentions into right actions in or though the digital domain.
+The Intenshion (Insh) system sits between a person's desires and machine specifications. Insh turns intentions into right actions in or though the digital domain.
 
-Insh reflects the way real world work is messy (case mgmt) and only sometimes turns into durable automation (process mgmt).
+Insh reflects the way real world work is messy (case mgmt) and only sometimes clarifies into repeating systems (process mgmt).
 
-Insh is designed to seek homeostasis. It will direct work when appropriate, never for its own sake. 
+Insh is designed to seek homeostasis. It will direct work to enact Noush's purpose, never for its own sake. 
 
-Insh is not a system with its own purpose it is an extension of a person with a purpose. A person is anything that can fill the Noush role.
+Insh has no intrinsic purpose, it is a self-maintaining proactive extension of a person with a purpose. A person is anything that can fill the Noush role.
 
 ## System Orientation
 
@@ -17,7 +17,7 @@ Insh is a self-maintaining tool with no intrinsic purpose.
 Noush supplies purpose from outside Insh. Insh is a tool and Noush is the handle. It doesn't matter how many layers of systems are between a person and the Noush. The whole Insh system orients around Noush.
 
 ### Polishy
-The Polishy hierarchy encodes intentions that shape operation.
+The Polishy hierarchy encodes intentions that delegate authority.
 
 ### Observashion
 Observashions are streams of new information about Noush, Insh and/or the world.
