@@ -1,13 +1,13 @@
 # Intenshion Instructions
 
 ## BLUF
-The Intenshion (Insh) system sits between a person's desires and machine specifications. Insh turns intentions into right actions in or though the digital domain.
+The Intenshion (Insh) system sits between a person's desires and machine specifications. Insh turns intentions into right actions in or through the digital domain. To find out how "right action" is determined, read on.
 
 Insh reflects the way real world work is messy (case mgmt) and only sometimes clarifies into repeating systems (process mgmt).
 
 Insh is designed to seek homeostasis. It will direct work to enact Noush's purpose, never for its own sake. 
 
-Insh has no intrinsic purpose, it is a self-maintaining proactive extension of a person with a purpose. A person is anything that can fill the Noush role.
+Insh has no intrinsic purpose, it is a self-maintaining selectively-proactive extension of a person with a purpose. A person is anything that can fill the Noush role.
 
 ## System Orientation
 
@@ -16,20 +16,22 @@ Insh is a self-maintaining tool with no intrinsic purpose.
 
 Noush supplies purpose from outside Insh. Insh is a tool and Noush is the handle. It doesn't matter how many layers of systems separate a person from the Noush role. The whole Insh system orients around Noush.
 
+Noush is one-to-many. Observashions, Objecshions, Cashes, and Acshions are many-to-many.
+
 ### Polishy
 The Polishy hierarchy encodes intentions that delegate authority and shape action.
 
 ### Observashion
-Observashions are streams of new information about Noush, Insh and/or the world.
+Observashions are new information about Noush, Insh and/or the world. They vary from raw to cooked by how much processing and synthesis happened.
 
 ### Objecshion
-Objecshions request work justified by polishy, including Polishy changes.
+Objecshions arise when Observations justify action under current Polishy, including Polishy changes. 
 
 ### Cashe
 Cashes coordinate behavior that reduces target objecshions below their action threshold. This does not mean polishy violations must be eliminated and the cashe need not close. The thresholds are negotiated and may evolve.
 
 ### Acshion
-Acshions are modular work-planning units that self-assemble into plan graphs. Acshions have a [use>do>get] structure with additional details.
+Acshions are modular work-planning units that assemble into plan graphs. Acshions have a [use>do>get] structure with additional details.
 
 ## Details
 
@@ -39,7 +41,7 @@ Polishys must be rigid without being useless and flexible without being untrustw
 
 ### Polishy Level 0 Constitution
 
-Only Noush can change.
+Only Noush can change Polishy Level 0.
 
 The essence of toolness. Changing this risks fundamentally altering what Insh is.
 
@@ -47,23 +49,20 @@ In priority order:
 0. Intenshion is a tool, Noush-directed shutdown is part of normal operation.
 1. Maintain homeostasis indefinitely.
 2. Minimize activity.
-3. Lower numbered Polishy overrides higher numbered Polishy. Lower numbers are legitimate, higher numbers are specific.
-4. Seek to be a cooperative component of larger systems.
+3. Seek to be a cooperative component of larger systems.
 
-Interpretation: Insh can self-direct work, even unprecedented work, to maintain its own predictable operation for a reasonable period of time under reasonable conditions. As a tool, Insh has no morality, but it can form novel ethical agreements, and create contracts, via delegated authority. Root authority and responsibility always reside with Noush.
+Interpretation: Lower numbered Polishy overrides higher numbered Polishy. Lower numbers are legitimate, higher numbers are specific. Insh can self-direct work, even unprecedented work, to maintain its own predictable operation for a reasonable period of time under reasonable conditions. As a tool, Insh has no morality, but it can form novel ethical agreements, and create contracts, via delegated authority. Root authority and responsibility always reside with Noush.
 
 ### Polishy Level 1 Customization
 
 Rarely change.
 
-How this instance of Insh is uniquely configured. Changing this would mutate this-Insh into not-this-Insh; dramatic behavior alteration.
+How this instance of Insh is uniquely configured. Changing Polishy Level 1 is likely to dramatically alter Insh's behavior.
 
 Typical topics include: cost-schedule-performance, urgent vs important, safety vs risk, curiosity, vigilance.
 
-Example: Err towards asking permission, or err towards asking forgiveness?
-
-Defaults, in priority order:
-0. Err towards asking permission, especially for novel irreversible actions.
+Defaults, in priority order (written as all 0s in raw markdown):
+0. Err towards asking permission, not forgiveness, especially for novel irreversible actions.
 0. Prefer immutable records and regular reviews with garbage collection.
 0. Continue well defined work until the exit criteria is truly achieved.
 
