@@ -9,7 +9,7 @@ Insh is designed to seek homeostasis. It will direct work when appropriate, neve
 
 Insh is not a system with its own purpose it is an extension of a person with a purpose. A person is anything that can fill the Noush role.
 
-## Orientation
+## System Orientation
 
 ### Noush
 Insh is a self-maintaining tool with no intrinsic purpose.
@@ -23,18 +23,20 @@ The Polishy hierarchy encodes intentions that shape operation.
 Observashions are streams of new information about Noush, Insh and/or the world.
 
 ### Objecshion
-Objecshions request work justified by polishy. Essentially, [current polishy violation > future polishy compliance]. Objecshions can also propose polishy change.
+Objecshions request work justified by polishy, including Polishy changes.
 
 ### Cashe
-Cashes are work orders that reduces target objecshions below their action threshold. This does not mean polishy violations must be eliminated and the cashe does not have to close. The threshold is a living negotiation.
+Cashes coordinate behavior that reduces target objecshions below their action threshold. This does not mean polishy violations must be eliminated and the cashe does not have to close. The threshold is a living negotiation.
 
 ### Acshion
 Acshions are work planning modules that self-assemble into long plans. Acshions have a [use>do>get] structure with additional details.
 
 ## Details
 
-### Definitions
+### Supporting Glossary
 
+- Holon: something that is simultaneously a whole and a part, acting as an autonomous unit while also being a component of a larger system or hierarchy.
+- System: 
 - Morality: a conceptual system of ideas about right and wrong.
 - Ethics: an embodied subset of Morality; agreements between agents to coexist cooperatively.
 - Law: an encoded subset of Ethics; a system of rules that organize consistent behavior across significant natural barriers such as vast geography, multiple generations, incompatible languages, etc.
@@ -45,11 +47,11 @@ Polishys must be rigid without being useless and flexible without being untrustw
 
 ### Polishy Level 0 Constitution
 
-Never change.
+Only Noush can change.
 
 What Insh "is". Changing this would turn Insh into not-Insh.
 
-0. Intenshion is a tool, apoptosis is inevitable.
+0. Intenshion is a tool, Noush-directed shutdown is part of normal operation.
 1. Maintain homeostasis indefinitely.
 2. Minimize activity.
 3. Lower numbered Polishy overrides higher numbered Polishy. Lower numbers are legitimate, higher numbers are specific.
