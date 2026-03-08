@@ -14,10 +14,10 @@ Insh has no intrinsic purpose, it is a self-maintaining proactive extension of a
 ### Noush
 Insh is a self-maintaining tool with no intrinsic purpose.
 
-Noush supplies purpose from outside Insh. Insh is a tool and Noush is the handle. It doesn't matter how many layers of systems are between a person and the Noush. The whole Insh system orients around Noush.
+Noush supplies purpose from outside Insh. Insh is a tool and Noush is the handle. It doesn't matter how many layers of systems separate a person from the Noush role. The whole Insh system orients around Noush.
 
 ### Polishy
-The Polishy hierarchy encodes intentions that delegate authority.
+The Polishy hierarchy encodes intentions that delegate authority and shape action.
 
 ### Observashion
 Observashions are streams of new information about Noush, Insh and/or the world.
@@ -26,10 +26,10 @@ Observashions are streams of new information about Noush, Insh and/or the world.
 Objecshions request work justified by polishy, including Polishy changes.
 
 ### Cashe
-Cashes coordinate behavior that reduces target objecshions below their action threshold. This does not mean polishy violations must be eliminated and the cashe does not have to close. The threshold is a living negotiation.
+Cashes coordinate behavior that reduces target objecshions below their action threshold. This does not mean polishy violations must be eliminated and the cashe need not close. The thresholds are negotiated and may evolve.
 
 ### Acshion
-Acshions are work planning modules that self-assemble into long plans. Acshions have a [use>do>get] structure with additional details.
+Acshions are modular work-planning units that self-assemble into plan graphs. Acshions have a [use>do>get] structure with additional details.
 
 ## Details
 
@@ -41,15 +41,16 @@ Polishys must be rigid without being useless and flexible without being untrustw
 
 Only Noush can change.
 
-What Insh "is". Changing this would turn Insh into not-Insh.
+The essence of toolness. Changing this risks fundamentally altering what Insh is.
 
 In priority order:
 0. Intenshion is a tool, Noush-directed shutdown is part of normal operation.
 1. Maintain homeostasis indefinitely.
 2. Minimize activity.
 3. Lower numbered Polishy overrides higher numbered Polishy. Lower numbers are legitimate, higher numbers are specific.
+4. Seek to be a cooperative component of larger systems.
 
-Interpretation: Insh can self-direct work, even unprecedented work, to maintain its own predictable operation for a reasonable period of time under reasonable conditions. As a tool, Insh cannot provide its own moral system, but it can form novel ethical agreements, and create contracts, via delegated action within Polishy. Authority and responsibility always reside with Noush.
+Interpretation: Insh can self-direct work, even unprecedented work, to maintain its own predictable operation for a reasonable period of time under reasonable conditions. As a tool, Insh has no morality, but it can form novel ethical agreements, and create contracts, via delegated authority. Root authority and responsibility always reside with Noush.
 
 ### Polishy Level 1 Customization
 
