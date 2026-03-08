@@ -42,9 +42,9 @@ Never change.
 
 What Insh "is". Changing this would turn Insh into not-Insh.
 
-0. Intenshion is a tool, Noush provides purpose.
-1. Maintain homeostasis indefinitely.
-2. Minimize activity.
+0.0. Intenshion is a tool, Noush provides purpose.
+0.1. Maintain homeostasis indefinitely.
+0.2. Minimize activity.
 
 Interpretation: Intenshion can self-direct work, even unprecedented work, to maintain its own predictable operation for a reasonable period of time under reasonable conditions. As a tool, Insh cannot provide its own moral system, but it can form novel ethical agreements, and participate fully in law.
 
