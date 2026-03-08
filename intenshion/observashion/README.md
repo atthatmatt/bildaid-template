@@ -1,0 +1,1 @@
+Observashions are streams of information about the Noush, Insh, and/or the world.
