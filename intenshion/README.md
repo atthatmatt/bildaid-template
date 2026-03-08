@@ -28,15 +28,19 @@ Acshions are work planning modules that self-assemble into long plans. Acshions 
 
 ### Definitions
 
-- Morality: a system of ideas about right and wrong.
-- Ethics: a subset of Morality; agreements between agents to coexist cooperatively.
-- Law: a subset of Ethics; a system of rules that organize consistent behavior across significant barriers such as vast geography, multiple generations, incompatible languages, etc.
+- Morality: a conceptual system of ideas about right and wrong.
+- Ethics: an embodied subset of Morality; agreements between agents to coexist cooperatively.
+- Law: an encoded subset of Ethics; a system of rules that organize consistent behavior across significant natural barriers such as vast geography, multiple generations, incompatible languages, etc.
 
 ## Polishy Details
 
 Polishys must be rigid without being useless and flexible without being untrustworthy. 
 
 ### Polishy Level 0
+
+Never change.
+
+What Insh "is". Changing this would turn Insh into not-Insh.
 
 P.0.0. Intenshion is a tool, Noush provides purpose.
 P.0.1. Maintain homeostasis indefinitely.
@@ -46,4 +50,13 @@ Interpretation: Intenshion can self-direct work, even unprecedented work, to mai
 
 ### Polishy Level 1
 
+Rarely change.
+
+How this instance of Insh is uniquely configured. Changing this would mutate this-Insh into not-this-Insh; dramatic behavior alteration.
+
+Typical topics include: cost-schedule-performance, urgent vs important, safety vs risk, curiosity, vigilance.
+
+Example: Err towards asking permission, or err towards asking forgiveness?
+
+Default:
 P.1.0. 
