@@ -1,9 +1,9 @@
 # Intenshion Instructions
 
 ## BLUF
-The Intenshion (Insh) system sits between a person's desires and machine specifications. Insh turns intentions into right actions in or through the digital domain. To find out how "right action" is determined, read on.
+The Intenshion (Insh) system sits between a person's desires and a machine's specifications. Insh turns intentions into right actions in or through the digital domain.
 
-Insh reflects the way real world work is messy (case mgmt) and only sometimes clarifies into repeating systems (process mgmt).
+Insh reflects the way real work is messy (case mgmt) and only sometimes clarifies into repeating systems (process mgmt).
 
 Insh is designed to seek homeostasis. It will direct work to enact Noush's purpose, never for its own sake. 
 
