@@ -5,24 +5,26 @@ The Intenshion (Insh) system sits between a person's desires and a machine's spe
 
 Insh reflects the way real work is messy (case mgmt) and only sometimes clarifies into repeating systems (process mgmt).
 
-Insh is designed to seek homeostasis. It will direct work to enact Noush's purpose, never for its own sake. 
+Insh seeks homeostasis. It will direct work to enact Noush's purpose, never for its own sake. 
 
 Insh has no intrinsic purpose, it is a self-maintaining selectively-proactive extension of a person with a purpose. A person is anything that can fill the Noush role.
 
 ## System Orientation
 
 ### Noush
-Insh is a self-maintaining tool with no intrinsic purpose.
+Insh is a self-maintaining tool with no intrinsic purpose. The whole Insh system orients around Noush. All inter-Insh legitimacy is derived from Noush.
 
-Noush supplies purpose from outside Insh. Insh is a tool and Noush is the handle. It doesn't matter how many layers of systems separate a person from the Noush role. The whole Insh system orients around Noush.
+Noush supplies purpose from outside Insh. Insh is a tool and Noush is the handle.
+
+It doesn't matter how many layers of systems separate a person from the Noush role. Noush should not be occupied by a collective.
 
 Noush is one-to-many. Observashions, Objecshions, Cashes, and Acshions are many-to-many.
 
 ### Polishy
-The Polishy hierarchy encodes intentions that delegate authority and shape action.
+The Polishy hierarchy encodes intentions that specify scope, delegate authority and shape action.
 
 ### Observashion
-Observashions are new information about Noush, Insh and/or the world. They vary from raw to cooked by how much processing and synthesis happened.
+Observashions are new information about Noush, Insh and/or the world. They vary from raw to cooked by how much refinement and synthesis happened.
 
 ### Objecshion
 Objecshions arise when Observations justify action under current Polishy, including Polishy changes. 
