@@ -35,6 +35,16 @@ Cashes coordinate behavior that reduces target objecshions below their action th
 ### Acshion
 Acshions are modular work-planning units that assemble into plan graphs. Acshions have a [use>do>get] structure with additional details.
 
+## Element Specs
+
+Recovered working specs now live in the element folders:
+
+- [Acshion](acshion/README.md) - `Use > Do > Get`, optional `Frame`, `Detail`, `Checks`, `Link`, and acshion-run semantics.
+- [Simon lint for Acshions](acshion/lint.md) - deterministic structure checks separate from correlator review.
+- [Multi-Resolution Acshion Index](acshion/multi-resolution-index.md) - horizontal `Get > Use` discovery and vertical general/specific variant discovery.
+- [Objecshion](objecshion/README.md) - signal record format, enrichment gates, lifecycle acshions, and hypoactivity principle.
+- [Cashe](cashe/README.md) - active coordination context and cashe patch invariant.
+
 ## Details
 
 ## Polishy Details
